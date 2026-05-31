@@ -1,0 +1,21 @@
+{
+	"compatibility_date": "2026-05-31",
+	"compatibility_flags": [
+		"global_fetch_strictly_public"
+	],
+	"name": "orbital-orbit",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "SESSION",
+			"id": "bed89aac8808401f8723b6fcb7500657"
+		}
+	],
+	"observability": {
+		"enabled": true
+	}
+}

@@ -1,0 +1,24 @@
+{
+  "name": "astro-cloudflare-compile-workaround",
+  "version": "1.0.0",
+  "description": "Workaround: Astro imageService compile + @astrojs/cloudflare preserveBuildClientDir build failure",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "astro",
+    "cloudflare",
+    "image",
+    "compile",
+    "astro-integration"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "astro": "^6.0.0"
+  }
+}
