@@ -456,64 +456,28 @@ const mode = config ?? 'cloudflare-binding';  // v6: magic, ambiguous
 - Matrix compatibility antara `output` mode dan `imageService`
 - Troubleshooting guide untuk "404 on images"
 
-### 3. Perbandingan: Astro v6 vs SvelteKit
+### 3. Kompleksitas Konfigurasi yang Perlu Dokumentasi Lebih Baik
 
-SvelteKit lebih superior untuk Cloudflare Workers deployment:
+Astro v6 memperkenalkan auto-detection untuk image service yang memang powerful, tapi memerlukan pemahaman yang lebih dalam:
 
-| Aspek | SvelteKit | Astro v6 |
-|-------|-----------|----------|
-| **Adapter Config** | Explicit, predictable | Auto-magic, ambiguous |
-| **Output Mode** | `prerender` per-route (granular) | Global `output` saja (all-or-nothing) |
-| **Image Pipeline** | Clear (vite-imagetools, unpic) | Auto-detect yang confusing |
-| **Dev Experience** | `wrangler dev` works consistently | Depends on output + imageService combo |
-| **Documentation** | Up-to-date, examples work | Often outdated, behavior changes not documented |
-| **Migration Path** | Clear deprecation warnings | Breaking changes tanpa announcement |
+**Behavior Matrix (yang perlu didokumentasikan):**
 
-**Contoh SvelteKit (Clean):**
+| output | imageService Default | Hasil HTML | Deploy Static? |
+|--------|---------------------|------------|----------------|
+| `'static'` | `'cloudflare-binding'` | `/_image?href=...` | ❌ **404** (no Worker) |
+| `'server'` | `'cloudflare-binding'` | `/_image?href=...` | ✅ Worker handle |
+| `'static'` + `'compile'` | `'compile'` | `/_astro/*.webp` | ✅ Static files |
 
-```javascript
-// svelte.config.js
-import adapter from '@sveltejs/adapter-cloudflare';
+**Learning Curve:**
+Untuk memahami kenapa image 404, developer perlu trace ke:
+- `normalizeImageServiceConfig()` — dimana default ditentukan
+- `preserveBuildClientDir` — impact ke asset pipeline  
+- Beda `cloudflare-binding` vs `compile` dan kapan pakai masing-masing
 
-export default {
-  kit: {
-    adapter: adapter({
-      // Explicit, no magic
-      routes: {
-        include: ['/*'],
-        exclude: ['<all>']
-      }
-    })
-  }
-};
-```
-
-```svelte
-<!-- src/routes/blog/+page.svelte -->
-<script>
-  // Per-page prerender control
-  export const prerender = true;  // atau false
-</script>
-
-<img src="/images/photo.jpg" alt="Static" />
-<!-- Atau pakai vite-imagetools untuk optimization -->
-```
-
-### 4. Dampak ke Developer Experience
-
-**Issue #16931 adalah symptom dari masalah lebih besar:**
-
-1. **Dokumentasi tidak setegas SvelteKit** — Astro mendokumentasikan "works with Cloudflare" tapi tidak jelaskan caveat-caveat penting
-
-2. **Konvensi berubah tanpa warning** — v5 hybrid → v6 server/static adalah perubahan architectural yang drastis
-
-3. **Debugging nightmare** — untuk tahu kenapa image 404, developer harus:
-   - Trace ke `normalizeImageServiceConfig()`
-   - Paham `preserveBuildClientDir`
-   - Mengerti bedanya `cloudflare-binding` vs `compile`
-   - Tau bahwa default untuk static = broken
-
-4. **No clear best practice** — Dokumentasi tidak menjawab: "Kalau mau blog static tapi wrangler dev, gimana?"
+**Dokumentasi yang kurang:**
+- Tidak ada compatibility matrix output × imageService
+- Tidak ada penjelasan "Kalau mau blog static tapi pakai wrangler dev, gimana?"
+- Tidak ada troubleshooting guide untuk "404 on images"
 
 ### 5. Rekomendasi untuk Astro Team
 
@@ -556,43 +520,32 @@ $ astro build
 
 ### 6. Refleksi: Maturity vs Documentation
 
-**Astro v6 adalah release yang promising tapi butuh investigasi lebih dalam:**
+**Astro v6 adalah major release dengan perubahan arsitektur yang signifikan:**
 
-1. **Warning CLI memang ada** — tapi dokumentasi belum mature/catch up
-2. **Magic behavior membutuhkan pemahaman lebih dalam** — bukan bug, tapi konvensi yang perlu dipelajari
-3. **Dokumentasi tidak se-eksplisit SvelteKit** — Astro v6 mungkin belum fully stabilized atau dokumentasinya yang belum update
-4. **"Works with Cloudflare" adalah simplification** — yang sebenarnya butuh pemahaman arsitektur Workers
+1. **Warning CLI untuk hybrid removal memang ada** — tapi dokumentasi belum fully catch up
+2. **Auto-detect behavior memang powerful** — tapi butuh pemahaman yang lebih dalam tentang konvensi
+3. **Framework baru released** — dokumentasi akan improve seiring waktu dan feedback dari komunitas
+4. **"Works with Cloudflare" butuh konteks** — perlu pemahaman arsitektur Workers untuk configuration yang optimal
 
-**Rekomendasi untuk Astro:**
-- Perlu dokumentasi yang lebih presisi dan matang
-- Matrix compatibility yang jelas antara output mode dan image service
-- Migration guide yang komprehensif
+**Rekomendasi untuk Astro Team:**
+- Perlu compatibility matrix yang jelas antara output mode dan image service
+- Troubleshooting guide untuk common issues (image 404, etc.)
+- Migration guide yang lebih komprehensif dari v5 → v6
 
-**SvelteKit adalah alternatif yang lebih mature** untuk developer yang membutuhkan:
-- Explicit configuration
-- Predictable behavior
-- Documentation yang sudah mature
-- Consistent dev experience dengan Wrangler
+**Pembelajaran:** Astro v6 powerful tapi learning curve lebih tinggi karena auto-detect magic. Explicit config lebih predictable untuk production.
 
 ## Solusi Sementara (Workaround)
 
-Untuk developer yang stuck dengan Astro v6:
-
-**Pilihan 1: Explicit Config (Recommended)**
+**Explicit Config (Recommended):**
 ```javascript
 // astro.config.mjs
 export default defineConfig({
-  // Selalu explicit, jangan rely on defaults
   output: 'server',
   adapter: cloudflare({
-    // Explicit set imageService
     imageService: 'cloudflare-binding'
   }),
 });
 ```
-
-**Pilihan 2: Consider Migration ke SvelteKit**
-Jika project baru atau refactoring besar, SvelteKit + Cloudflare Workers lebih predictable.
 
 ## References
 
@@ -600,7 +553,6 @@ Jika project baru atau refactoring besar, SvelteKit + Cloudflare Workers lebih p
 - Cloudflare Adapter Docs: https://docs.astro.build/en/guides/integrations-guide/cloudflare/
 - Cloudflare Images: https://developers.cloudflare.com/images/
 - Astro Assets: https://docs.astro.build/en/guides/images/
-- SvelteKit Cloudflare Adapter: https://kit.svelte.dev/docs/adapter-cloudflare
 
 ## Contributors
 
