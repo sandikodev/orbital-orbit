@@ -20,7 +20,7 @@ in **404** on optimized images.
 
 This integration bridges the path gap with two hooks:
 
-1. **Vite `writeBundle` (client env)** — copies source JPGs from prerender
+1. **Vite `writeBundle` (prerender env)** — copies source JPGs from the prerender
    output (`dist/server/.prerender/_astro/`) to `dist/_astro/` **before** the
    image optimizer runs.
 2. **`astro:build:done`** — copies generated `.webp`/`.avif` files from
