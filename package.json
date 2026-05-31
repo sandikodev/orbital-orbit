@@ -14,11 +14,11 @@
     "generate-types": "wrangler types"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "https://pkg.pr.new/@astrojs/cloudflare@d45fd54",
+    "@astrojs/cloudflare": "^13.6.0",
     "@astrojs/mdx": "^6.0.1",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "https://pkg.pr.new/astro@d45fd54",
+    "astro": "^6.4.2",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
