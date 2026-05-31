@@ -5,7 +5,6 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
-import cloudflareCompileWorkaround from 'astro-cloudflare-compile-workaround';
 
 export default defineConfig({
   site: 'https://example.com',
@@ -35,6 +34,6 @@ export default defineConfig({
     },
   ],
 
-  adapter: cloudflare({ imageService: 'compile' }),
-  integrations: [mdx(), sitemap(), cloudflareCompileWorkaround()],
+  adapter: cloudflare(),
+  integrations: [mdx(), sitemap()],
 });
