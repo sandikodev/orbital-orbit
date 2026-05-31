@@ -405,16 +405,26 @@ Astro v6 adapter lebih "smart" tapi juga lebih kompleks:
 
 ## Kritik & Refleksi: Masalah Fundamental Astro v6
 
-### 1. Hybrid Mode Sudah Di-Drop Tanpa Migration Path Jelas
+### 1. Hybrid Mode Sudah Di-Drop Dengan Dokumentasi Yang Belum Mature
 
-**Fakta:** Astro v6 menghapus `output: 'hybrid'` — padahal ini adalah fitur yang banyak dipakai user untuk mix static + dynamic pages.
+**Fakta:** Astro v6 menghapus `output: 'hybrid'` — fitur yang banyak dipakai user untuk mix static + dynamic pages.
+
+**Warning memang ada di CLI saat build:**
+```bash
+$ astro build
+[config] Astro found issue(s) with your configuration:
+
+! The output: "hybrid" option has been removed. Use output: "static" 
+  (the default) instead, which now behaves the same way.
+```
 
 **Masalah:**
-- Tidak ada announcement yang jelas di changelog
-- Dokumentasi tidak update secara komprehensif
-- User dengan config `output: 'hybrid'` tiba-tiba broken tanpa warning
+- Warning CLI ada, tapi dokumentasi belum mature/update secara komprehensif
+- Tidak ada migration guide yang menjelaskan perbedaan perilaku antara hybrid vs static/server
+- User mendapat warning tapi tidak tahu cara migrate dengan benar
+- Astro v6 mungkin belum fully stabilized atau dokumentasinya yang belum update
 
-**Impact:** Developer harus refactor seluruh architecture ke `output: 'server'` atau `output: 'static'`, yang masing-masing punya trade-off drastis.
+**Impact:** Developer harus refactor seluruh architecture ke `output: 'server'` atau `output: 'static'`, tanpa panduan yang jelas tentang trade-offs masing-masing.
 
 ### 2. Auto-Detect Magic yang Confusing
 
@@ -441,7 +451,10 @@ const mode = config ?? 'cloudflare-binding';  // v6: magic, ambiguous
 - Harus explicit set `imageService: 'compile'` untuk static
 - Atau switch ke `output: 'server'` untuk menggunakan runtime optimization
 
-**Ini adalah breaking change yang tidak didokumentasikan dengan baik.**
+**Ini adalah behavioral change yang dokumentasinya belum mature** — warning ada di CLI, tapi tidak ada:
+- Dokumentasi yang menjelaskan perbedaan `cloudflare-binding` vs `compile`
+- Matrix compatibility antara `output` mode dan `imageService`
+- Troubleshooting guide untuk "404 on images"
 
 ### 3. Perbandingan: Astro v6 vs SvelteKit
 
@@ -541,20 +554,25 @@ $ astro build
 - Hybrid → Server: Performance impact, cold start considerations
 - Pages → Workers: Architectural differences
 
-### 6. Validasi Frustrasi
+### 6. Refleksi: Maturity vs Documentation
 
-**Valid untuk muak dengan Astro v6** karena:
+**Astro v6 adalah release yang promising tapi butuh investigasi lebih dalam:**
 
-1. **Breaking changes tidak didokumentasikan dengan baik**
-2. **Magic behavior membuat debugging sulit**  
-3. **Dokumentasi tidak se-explisit SvelteKit**
-4. **"Works with Cloudflare" adalah oversimplification** yang menyesatkan
+1. **Warning CLI memang ada** — tapi dokumentasi belum mature/catch up
+2. **Magic behavior membutuhkan pemahaman lebih dalam** — bukan bug, tapi konvensi yang perlu dipelajari
+3. **Dokumentasi tidak se-eksplisit SvelteKit** — Astro v6 mungkin belum fully stabilized atau dokumentasinya yang belum update
+4. **"Works with Cloudflare" adalah simplification** — yang sebenarnya butuh pemahaman arsitektur Workers
 
-**SvelteKit adalah alternatif yang lebih clean** untuk developer yang value:
+**Rekomendasi untuk Astro:**
+- Perlu dokumentasi yang lebih presisi dan matang
+- Matrix compatibility yang jelas antara output mode dan image service
+- Migration guide yang komprehensif
+
+**SvelteKit adalah alternatif yang lebih mature** untuk developer yang membutuhkan:
 - Explicit configuration
 - Predictable behavior
-- Clear documentation
-- Better dev experience dengan Wrangler
+- Documentation yang sudah mature
+- Consistent dev experience dengan Wrangler
 
 ## Solusi Sementara (Workaround)
 
