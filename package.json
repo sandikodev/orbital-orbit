@@ -13,16 +13,13 @@
     "astro": "astro",
     "generate-types": "wrangler types"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "dependencies": {
     "@astrojs/cloudflare": "^13.6.0",
     "@astrojs/mdx": "^6.0.1",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
-    "astro-cloudflare-compile-workaround": "workspace:*",
     "astro": "^6.4.2",
+    "astro-cloudflare-compile-workaround": "workspace:*",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
